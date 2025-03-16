@@ -11,7 +11,7 @@ For my project,
 Task C. Customize the HTML user interface for your customer’s application. The user interface should include the shop 
 name, the product names, and the names of the parts.
 <br>
-*filename: mainscreen.html*
+**Filename:** `mainscreen.html`
 
 line 14: Changed title to Tommy's Electronics Store.
 ```
@@ -28,7 +28,7 @@ line 19: Changed h1 to Electronics Store
 Task D.  Add an “About” page to the application to describe your chosen customer’s company to web viewers and include 
 navigation to and from the “About” page and the main screen.
 
-*filename: mainscreen.html*
+**Filename:** `mainscreen.html`
 Line 17: added button to About Me page
 
 ```
@@ -36,7 +36,7 @@ Line 17: added button to About Me page
 
 ```
 
-*filename: MainScreenControllerr*
+**Filename:** `MainScreenControllerr`
 Lines 55-58: added code to Map About me page
 ```
 //Mapping to About Page
@@ -45,7 +45,7 @@ public String about() { return "about.html"; }
 
 ```
 
-*filename: about.html*
+**Filename:** `about.html`
 Lines 1-30: added template similar to mainscreen.html page
 
 ```
@@ -84,7 +84,7 @@ Lines 1-30: added template similar to mainscreen.html page
 Task E. Add a sample inventory appropriate for your chosen store to the application. You should have five parts and 
 five products in your sample inventory and should not overwrite existing data in the database.
 
-*filename: BootStrapData*
+**Filename:** `BootStrapData`
 Changes made to this file include adding 5 products and 5 inhouse/outsourced parts. 
 
 Added code to BootStrapData class
@@ -190,7 +190,7 @@ if (inhousePartRepository.count() == 0) {
 
 ```
 
-*filename applications.properties*
+**Filename:** `applications.properties`
 Line 6: changed name of DB 
 
 ```
@@ -198,7 +198,337 @@ spring.datasource.url=jdbc:h2:file:~/Ashworth-db
 
 ```
 
+Task F: Add a “Buy Now” button to your product list. Your “Buy Now” button must meet each of the following parameters:
+•  The “Buy Now” button must be next to the buttons that update and delete products.
+• The button should decrement the inventory of that product by one. It should not affect the inventory of any of the 
+associated parts.
+•  Display a message that indicates the success or failure of a purchase.
 
+Added a Buy now button to product list
+**Filename:**  `mainscreen.html`
+
+Line 86:
+
+```
+<a th:href="@{/buyProduct(productID=${tempProduct.id})}" class="btn btn-primary btn-sm mb-3">Buy Now</a>
+
+```
+
+Added a product controller buy product
+**Filename:**  `AddProductController`
+
+This code creates a buyProduct method to check if the product is in stock. If it is in stock and the purchase is successful it will return the success confirmation page. If it is out of stock it will return a failed confirmation page. When user selects buy now on a product this code will decrement the inventory of that product by one. It does not affect the inventory of any of  the associated parts.
+
+Lines 179-206:
+
+```
+
+
+    @GetMapping("/buyProduct")
+    public String buyProduct(@RequestParam("productID") int theId, Model theModel) {
+        ProductService productService = context.getBean(ProductServiceImpl.class);
+        Product product =productService.findById(theId);
+
+        int inv = product.getInv();
+
+        if(inv == 0)
+        {
+            return "failure";
+        }
+        else
+        {
+            //reduce inventory value by 1
+            inv -= 1;
+
+            //Setting new value of inventory
+            product.setInv(inv);
+
+            //Saving object with new inventory value
+            productService.save(product);
+
+            return "success";
+        }
+
+
+    }
+
+```
+
+Added our 2 new files failure.html and success.html
+Both of these new files returns the confirmation of either success or failure when selecting the Buy Now button.
+**Filename:**  `failure.html`
+
+```
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--    <meta charset="UTF-8">-->
+    <title>Purchase Failure</title>
+</head>
+<body>
+<h1>Your purchase was not successful</h1>
+
+<a href="/mainscreen">Link
+    to Main Screen</a>
+</body>
+</html>
+
+```
+
+**Filename:**  `success.html`
+
+```
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--    <meta charset="UTF-8">-->
+    <title>Purchase Success</title>
+</head>
+<body>
+<h1>You successfully bought the product.</h1>
+
+<a href="/mainscreen">Link
+    to Main Screen</a>
+</body>
+</html>
+
+```
+Task G: Modify the parts to track maximum and minimum inventory by doing the following:
+•  Add additional fields to the part entity for maximum and minimum inventory.
+•  Modify the sample inventory to include the maximum and minimum fields.
+•  Add to the InhousePartForm and OutsourcedPartForm forms additional text inputs for the inventory so the user can set the maximum and minimum values.
+•  Rename the file the persistent storage is saved to.
+•  Modify the code to enforce that the inventory is between or at the minimum and maximum value.
+
+Modified BootStrapData.java, added setMinInv, setMaxInv to each part Inhouse & Outsourced.
+
+**Filename:** `BootStrapData`
+Lines - 53-54, 65-66, 80-81, 93-94, 106-107
+
+```
+ihp1.setMinInv(1);
+ihp1.setMaxInv(100);
+
+ihp2.setMinInv(1);
+ihp2.setMaxInv(200);
+
+osp1.setMinInv(1);
+osp1.setMaxInv(100);
+
+
+osp2.setMinInv(1);
+osp2.setMaxInv(120);
+
+osp3.setMinInv(1);
+osp3.setMaxInv(100);
+
+```
+Added our Validator @ValidInventory to Line 23 in Part
+Created our minInv and maxInv variables in our Part file
+Created 4 new getter and setter methods to get and set both minInv and maxInv
+
+**Filename:** `Part`
+
+Line 23 -
+
+``` 
+@ValidInventory
+
+```
+
+Line 33- 38
+
+```
+
+    @Min(value = 0, message = "Min Inventory value must be positive")
+    int minInv;
+
+    @Min(value = 0, message = "Max Inventory value must be positive")
+    int maxInv;
+
+```
+
+Line 92-107
+
+```
+
+    public int getMinInv() {
+        return minInv;
+    }
+
+    public void setMinInv(int minInv) {
+        this.minInv = minInv;
+    }
+
+    public int getMaxInv() {
+        return maxInv;
+    }
+
+    public void setMaxInv(int maxInv) {
+        this.maxInv = maxInv;
+    }
+
+```
+
+Created 2 new Files
+
+InventoryValidator and ValidInventory
+Allows you to validate if the inventory value of a part is between the minimum and maximum inventory values
+
+**Filename:** `InventoryValidator`
+
+```
+package com.example.demo.validators;
+
+import com.example.demo.domain.Part;
+import com.example.demo.domain.Product;
+import com.example.demo.service.ProductService;
+import com.example.demo.service.ProductServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+/**
+ *
+ *
+ *
+ *
+ */
+public class InventoryValidator implements ConstraintValidator<ValidInventory, Part> {
+    @Autowired
+    private ApplicationContext context;
+    public static  ApplicationContext myContext;
+    @Override
+    public void initialize(ValidInventory constraintAnnotation) {
+//        ConstraintValidator.super.initialize(constraintAnnotation);
+    }
+
+    @Override
+    public boolean isValid(Part part, ConstraintValidatorContext constraintValidatorContext) {
+        if (context == null) return true;
+        if (context != null) myContext = context;
+        if (part == null) {
+            return false;
+        } else if (part.getInv() < part.getMinInv()) {
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Insufficient inventory for part: " + part.getName()).addConstraintViolation();
+            return false;
+        } else if (part.getInv() > part.getMaxInv()) {
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Too much inventory for part: " + part.getName()).addConstraintViolation();
+            return false;
+        }
+
+
+        return true;
+    }
+}
+```
+**Filename:**  `ValidInventory`
+
+```
+package com.example.demo.validators;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ *
+ *
+ *
+ *
+ */
+@Constraint(validatedBy = {InventoryValidator.class})
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ValidInventory {
+    String message() default "Inventory Error.";
+    Class<?> [] groups() default {};
+    Class<? extends Payload> [] payload() default {};
+
+}
+
+```
+
+Added two new table headers and I displayed minInv and maxinv of the tempPart object. This was to ensure that minimum
+and maximum inventory values are shown on the page for each part.
+
+**Filename:**  `mainscreen.html`
+
+Lines 39-40
+
+```
+<th>Min Inventory</th>
+<th>Max Inventory</th>
+
+```
+
+Lines 49-50
+
+```
+
+<td th:text="${tempPart.minInv}">1</td>
+<td th:text="${tempPart.maxInv}">1</td>
+
+```
+
+Updated InhousePartForm.html and OutsourcedPartForm.html
+This was for Error handling for validation errors. If I enter a inventory number higher than max inventory it will throw an error message.
+
+**Filename:**  `InhousePartForm.html`
+```
+<div th:if="${#fields.hasAnyErrors()}">
+        <ul>
+            <li th:each="err: ${#fields.allErrors()}" th:text="${err}">
+
+            </li>
+        </ul>
+    </div>
+
+```
+
+**Filename:**  `OutsourcedPartForm.html`
+
+```
+<div th:if="${#fields.hasAnyErrors()}">
+        <ul>
+            <li th:each="err: ${#fields.allErrors()}" th:text="${err}">
+
+            </li>
+        </ul>
+    </div>
+
+```
+
+Updated applications.properties DB name and re-ran program
+
+**Filename:**  `applications.properties`
+
+Line 6 -
+
+```
+spring.datasource.url=jdbc:h2:file:~/TommyAshdb-130
+```
+
+Task H:
 
 
 

@@ -47,9 +47,11 @@ public class BootStrapData implements CommandLineRunner {
             InhousePart ihp1 = new InhousePart();
             // Setting the values
             ihp1.setName("LED Light");
-            ihp1.setInv(150);
+            ihp1.setInv(50);
             ihp1.setPrice(1.00);
             ihp1.setId(2);
+            ihp1.setMinInv(1);
+            ihp1.setMaxInv(100);
             //Saving in inhousepartrespository
             inhousePartRepository.save(ihp1);
 
@@ -57,9 +59,11 @@ public class BootStrapData implements CommandLineRunner {
             InhousePart ihp2 = new InhousePart();
             // Setting the values
             ihp2.setName("Resistor");
-            ihp2.setInv(200);
+            ihp2.setInv(50);
             ihp2.setPrice(0.25);
             ihp2.setId(3);
+            ihp2.setMinInv(1);
+            ihp2.setMaxInv(200);
             //Saving in inhousepartrespository
             inhousePartRepository.save(ihp2);
         }
@@ -70,9 +74,11 @@ public class BootStrapData implements CommandLineRunner {
             //Setting the values
             osp1.setCompanyName("HP");
             osp1.setName("Capacitor");
-            osp1.setInv(100);
+            osp1.setInv(50);
             osp1.setPrice(0.50);
             osp1.setId(1);
+            osp1.setMinInv(1);
+            osp1.setMaxInv(100);
             //Saving in outsourcedPartRepository
             outsourcedPartRepository.save(osp1);
 
@@ -81,9 +87,11 @@ public class BootStrapData implements CommandLineRunner {
             //Setting the values
             osp2.setCompanyName("HP");
             osp2.setName("Transistor");
-            osp2.setInv(120);
+            osp2.setInv(50);
             osp2.setPrice(0.75);
             osp2.setId(4);
+            osp2.setMinInv(1);
+            osp2.setMaxInv(120);
             //Saving in outsourcedPartRepository
             outsourcedPartRepository.save(osp2);
 
@@ -92,9 +100,11 @@ public class BootStrapData implements CommandLineRunner {
             //Setting the values
             osp3.setCompanyName("HP");
             osp3.setName("IC Chip");
-            osp3.setInv(100);
+            osp3.setInv(50);
             osp3.setPrice(2.50);
             osp3.setId(5);
+            osp3.setMinInv(1);
+            osp3.setMaxInv(100);
             //Saving in outsourcedPartRepository
             outsourcedPartRepository.save(osp3);
         }
