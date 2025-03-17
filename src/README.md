@@ -769,6 +769,14 @@ Lines 159-193:
 
 ```
 
+Task J: Remove the class files for any unused validators in order to clean your code.
+
+Deleted Unused Validator
+
+**filename** `DeletePartValidator.java`
+**filename** `ValidDeletePart.java`
+
+
 
 
 
