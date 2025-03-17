@@ -718,6 +718,59 @@ public @interface ValidMax {
 ```
 
 
+Task I: Add at least two unit tests for the maximum and minimum fields to the PartTest class in the test package.
+
+2 unit tests for the max and min fields to the PartTest class in the test package.
+getMinAndMax verifies that the getMinInv() and getMaxInv() methods return the correct values after setting them.
+
+setMinAndMax() test verifies that the setMinInv() and setMaxInv() methods correctly store the values. 
+
+**filename** `PartTest`
+
+Lines 159-193:
+
+```
+
+
+    @Test
+    void getMinAndMax() {
+        int minValue = 1;
+        int maxValue = 10;
+
+        partIn.setMinInv(minValue);
+        partIn.setMaxInv(maxValue);
+        assertEquals(minValue, partIn.getMinInv());
+        assertEquals(maxValue, partIn.getMaxInv());
+
+        partOut.setMinInv(minValue);
+        partOut.setMaxInv(maxValue);
+        assertEquals(minValue, partOut.getMinInv());
+        assertEquals(maxValue, partOut.getMaxInv());
+    }
+
+    @Test
+    void setMinAndMax() {
+        int minValue = 1;
+        int maxValue = 10;
+
+        partIn.setMinInv(minValue);
+        partIn.setMaxInv(maxValue);
+
+        assertEquals(minValue, partIn.getMinInv());
+        assertEquals(maxValue, partIn.getMaxInv());
+
+        partOut.setMinInv(minValue);
+        partOut.setMaxInv(maxValue);
+
+        assertEquals(minValue, partOut.getMinInv());
+        assertEquals(maxValue, partOut.getMaxInv());
+    }
+}
+
+```
+
+
+
 
 
 
