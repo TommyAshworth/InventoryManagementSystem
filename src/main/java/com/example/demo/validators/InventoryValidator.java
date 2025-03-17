@@ -33,11 +33,11 @@ public class InventoryValidator implements ConstraintValidator<ValidInventory, P
             return false;
         } else if (part.getInv() < part.getMinInv()) {
             constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext.buildConstraintViolationWithTemplate("Insufficient inventory for part: " + part.getName()).addConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Not enough Inventory for parts: " + part.getName()).addConstraintViolation();
             return false;
         } else if (part.getInv() > part.getMaxInv()) {
             constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext.buildConstraintViolationWithTemplate("Too much inventory for part: " + part.getName()).addConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("Exceeds the amount of inventory: " + part.getName()).addConstraintViolation();
             return false;
         }
 

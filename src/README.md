@@ -528,7 +528,195 @@ Line 6 -
 spring.datasource.url=jdbc:h2:file:~/TommyAshdb-130
 ```
 
-Task H:
+Task H: Task H: H.  Add validation for between or at the maximum and minimum fields. The validation must include the following:
+•  Display error messages for low inventory when adding and updating parts if the inventory is less than the minimum number of parts.
+•  Display error messages for low inventory when adding and updating products lowers the part inventory below the minimum.
+•  Display error messages when adding and updating parts if the inventory is greater than the maximum.
+
+New validator for min inventory
+Added error message for min inventory when updating parts used in products.
+**filename** `ValidMin.java`
+Lines 1-24
+
+```
+package com.example.demo.validators;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ *
+ *
+ *
+ *
+ */
+@Constraint(validatedBy = {MinValidator.class})
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ValidMin {
+    String message() default "Below the minimum";
+    Class<?> [] groups() default {};
+    Class<? extends Payload> [] payload() default {};
+
+}
+
+```
+
+**filename** `MinValidator`
+
+Lines 1-32
+
+```
+package com.example.demo.validators;
+
+import com.example.demo.domain.Part;
+import com.example.demo.domain.Product;
+import com.example.demo.service.ProductService;
+import com.example.demo.service.ProductServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+/**
+ *
+ *
+ *
+ *
+ */
+public class MinValidator implements ConstraintValidator<ValidMin, Part> {
+    @Autowired
+    private ApplicationContext context;
+    public static  ApplicationContext myContext;
+    @Override
+    public void initialize(ValidMin constraintAnnotation) {
+//        ConstraintValidator.super.initialize(constraintAnnotation);
+    }
+
+    @Override
+    public boolean isValid(Part part, ConstraintValidatorContext constraintValidatorContext) {
+        return part.getInv() > part.getMinInv();
+    }
+}
+
+
+```
+
+Adding model class validator to Part.java
+
+**filename** `Part.java`
+
+Line 24-25 -
+
+```
+@ValidMin
+@ValidMax
+```
+
+Enhanced EnufPartsValidator.java for inventory validation
+Modified the isValid method in EnufPartsValidator.java to include validation logic that checks the inventory for associated parts if they fall below the min threshold when the product inventory is decremented.
+
+Added a check to ensure that the remaining inventory of each part is sufficient to meet the min inventory requirement after adjusting for a product purchase.
+
+Created custom error messages using ConstraintValidatorContext to provide more informative feedback when the validation fails, ensuring users are notified when there is insufficient inventory for a part.
+
+**filename** `EnufPartsValidator`
+
+Lines 36-44
+
+```
+    if (p.getInv()<(product.getInv()-myProduct.getInv())) {
+                    constraintValidatorContext.disableDefaultConstraintViolation();
+                    constraintValidatorContext.buildConstraintViolationWithTemplate("Insufficient inventory for part: " + p.getName()).addConstraintViolation();
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+```
+
+Created 2 new files ValidMax Annotation and MaxValidator for Inventory Validation.
+Created a custom validation annotation@ValidMax to enforce the rule that part inventory should not exceed the max inventory limit.
+Created the MaxValidator class, implementing the ConstraintValidator, to check if a part's inventory exceeds its max allowed value.
+The isValid method in MaxValidator compares the part's inventory to the maxInv value and returns false if the inventory is greater than the max, triggering an error.
+The custom error message "Count is above maximum" is provided through the ValidMax annotation.
+
+**filename** `MaxValidator`
+Lines 1-29
+```
+package com.example.demo.validators;
+
+import com.example.demo.domain.Part;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+/**
+ *
+ *
+ *
+ *
+ */
+public class MaxValidator implements ConstraintValidator<ValidMax, Part> {
+    @Autowired
+    private ApplicationContext context;
+    public static  ApplicationContext myContext;
+    @Override
+    public void initialize(ValidMax constraintAnnotation) {
+//        ConstraintValidator.super.initialize(constraintAnnotation);
+    }
+
+    @Override
+    public boolean isValid(Part part, ConstraintValidatorContext constraintValidatorContext) {
+        return part.getInv() > part.getMaxInv();
+    }
+}
+
+```
+
+**filename** `ValidMax`
+
+Lines 1-26
+
+```
+package com.example.demo.validators;
+
+import com.example.demo.validators.MaxValidator;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ *
+ *
+ *
+ *
+ */
+@Constraint(validatedBy = {MaxValidator.class})
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ValidMax {
+    String message() default "Count is above Maximum";
+    Class<?> [] groups() default {};
+    Class<? extends Payload> [] payload() default {};
+
+}
+
+
+```
+
 
 
 
