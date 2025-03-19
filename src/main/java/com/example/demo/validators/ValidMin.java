@@ -13,11 +13,12 @@ import java.lang.annotation.Target;
  *
  *
  */
-@Constraint(validatedBy = {PriceProductValidator.class})
+@Constraint(validatedBy = {MinValidator.class})
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidProductPrice {
-    String message() default "Price of the product must be greater than the sum of the price of the parts.";
+public @interface ValidMin {
+    String message() default "Below the minimum";
     Class<?> [] groups() default {};
     Class<? extends Payload> [] payload() default {};
+
 }
